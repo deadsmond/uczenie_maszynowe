@@ -31,35 +31,33 @@ def zadanie_4():
                     'habitat']
     data = pd.DataFrame(pd.read_csv('mushrooms.tsv', sep="\t", header=None, names=column_names))
 
-    learn_set = 0.9
-    test_set = 1 - learn_set
+    learn_set = 0.75
 
-    # Convert string data into dummy integer
+    # get dummies numbers
     data = data.dropna()
     data = pd.get_dummies(data)
 
-    # split into input (X) and output (y) variables
-    x = data.drop(columns=[0])
-    y = data[[0]].copy()
+    # split into input (x) and expected output (y)
+    x = data.drop(columns=["class_e", "class_p"])
+    y = data[["class_e"]].copy()
 
-    # Create Keras model using layers
+    # Create model
     model = Sequential()
-    model.add(Dense(18, input_dim=22, activation='relu'))
+    model.add(Dense(18, input_dim=117, activation='relu'))
     model.add(Dense(6, activation='sigmoid'))
     model.add(Dense(1, activation='sigmoid'))
 
-    # Compile Keras model
+    # Compile model
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-    # Fit Keras model on dataset
-    model.fit(x, y, validation_split=test_set, epochs=30, batch_size=10, verbose=0)
+    # Fit the model using the training sets
+    model.fit(x, y, validation_split=(1 - learn_set), epochs=30, batch_size=10, verbose=0)
 
-    # Evaluate Keras model
-    # accuracy:
-    accuracy = model.evaluate(x, y)
-    # score
-    score = accuracy[1]
-    print('Program completed with Accuracy: %.2f' % (score*100) + '%')
+    # evaluate model:
+    model.summary()
+    evaluate = model.evaluate(x, y)
+    print('loss value: %.10f' % evaluate[0])
+    print('score: %.2f' % (evaluate[1]*100) + '%')
 
 
 if __name__ == '__main__':
